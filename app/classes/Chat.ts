@@ -14,10 +14,10 @@ export class Chat {
         return [...this.messages]
     }
 
-    addMessage({content}: SentChatMessage) {
-
+    addMessage({content, author}: SentChatMessage) {
         const message: ChatMessage = {
             id: this.nextId(),
+            author: author.trim(),
             content: content.trim(),
             at: (new Date()).toISOString()
         }

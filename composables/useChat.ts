@@ -1,8 +1,10 @@
 import {useSocket} from "@/composables/useSocket";
 import type {ChatMessage} from "@/app/schemas/chat";
+import {SentChatMessageSchema} from "@/app/schemas/chat";
 
 const EMPTY_CURRENT_MESSAGE = "";
 export const useChat = (room: string) => {
+    const {username} = useUsername()
     const {
         socket,
         transport,
@@ -13,7 +15,7 @@ export const useChat = (room: string) => {
         }
     })
     const messages = ref<Array<ChatMessage>>([]);
-    const messageToSend = ref<string>(EMPTY_CURRENT_MESSAGE);
+    const messageContent = ref<string>(EMPTY_CURRENT_MESSAGE);
 
     socket.on('message.all', (allMessages) => {
         messages.value = allMessages
@@ -23,20 +25,19 @@ export const useChat = (room: string) => {
     })
 
     const sendMessage = () => {
-        if (isBlank(toValue(messageToSend))) {
-            return
-        }
+        const message = SentChatMessageSchema.parse({
+            author: toValue(username),
+            content: toValue(messageContent)
+        })
 
-        socket.emit('message.sent', {
-            content: toValue(messageToSend)
-        });
+        socket.emit('message.sent', message);
 
-        messageToSend.value = EMPTY_CURRENT_MESSAGE;
+        messageContent.value = EMPTY_CURRENT_MESSAGE;
     }
 
     return {
         messages,
-        messageToSend,
+        messageContent,
         sendMessage,
         socket,
         transport,

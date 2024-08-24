@@ -1,26 +1,41 @@
 <template>
     <div class="flex flex-col h-screen">
-        <div class="py-4 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <NuxtLink to="/">
-                    <UButton
-                        icon="i-heroicons-chevron-left"
-                        variant="ghost"
-                    />
-                </NuxtLink>
+        <div class="py-4 flex gap-2 items-center">
+            <NuxtLink to="/">
+                <UButton
+                    icon="i-heroicons-arrow-left"
+                    variant="ghost"
+                />
+            </NuxtLink>
 
+            <div class="flex flex-wrap grow items-center justify-between gap-2">
                 <span>#{{ room }}</span>
-            </div>
 
-            <UBadge v-if="isConnected" color="green" variant="soft">Connected via {{ transport }}</UBadge>
-            <UBadge v-else color="red">Disconnected</UBadge>
+                <UButton
+                    v-if="isConnected"
+                    color="green"
+                    variant="soft"
+                    @click="isEditUsernameModalOpen=true"
+                >
+                    Connected via {{ transport }} as {{ username }}
+                </UButton>
+                <UBadge
+                    v-else
+                    color="red"
+                    variant="soft"
+                >
+                    Disconnected
+                </UBadge>
+            </div>
         </div>
 
-        <div class="py-4 flex flex-col-reverse gap-4 grow overflow-y-auto pr-4">
+        <div class="py-4 flex flex-col-reverse grow overflow-y-auto pr-4">
             <ChatMessageCard
-                v-for="message in messages.toReversed()"
+                v-for="(message, index) in displayedMessages"
                 :key="message.id"
                 :message="message"
+                :previous-message="displayedMessages[index+1]"
+                :next-message="displayedMessages[index-1]"
             />
         </div>
 
@@ -31,44 +46,44 @@
                 :rows="1"
                 :maxrows="4"
                 size="lg"
-                v-model="messageToSend"
+                v-model="messageContent"
                 placeholder="Message..."
                 autocomplete="off"
-                @keyup="handleKeyUp"
+                @keyup.shift.enter="sendMessage"
             >
             </UTextarea>
 
             <UButton
-                :disabled="isBlank(messageToSend)"
+                :disabled="isBlank(messageContent)"
                 size="lg"
                 variant="solid"
                 icon="i-heroicons-paper-airplane-20-solid"
                 @click="sendMessage"
             />
         </div>
+
+        <EditUsernameModal v-model:opened="isEditUsernameModalOpen" />
     </div>
 </template>
 
 <script setup lang="ts">
 import ChatMessageCard from "@/components/chat/ChatMessageCard.vue";
+import EditUsernameModal from "@/components/chat/EditUsernameModal.vue"
 import {useChat} from "@/composables/useChat";
 
+const {username, isUsernameBlank} = useUsername()
 const {params} = useRoute();
 const room = params.room as string;
+
+const isEditUsernameModalOpen = ref(toValue(isUsernameBlank))
 
 const {
     sendMessage,
     messages,
-    messageToSend,
+    messageContent,
     isConnected,
     transport
 } = useChat(room)
 
-const handleKeyUp = (e: KeyboardEvent) => {
-    if (e.key === "Enter") {
-        e.preventDefault();
-
-        sendMessage()
-    }
-}
+const displayedMessages = computed(() => toValue(messages).toReversed())
 </script>
