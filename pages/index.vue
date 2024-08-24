@@ -57,7 +57,6 @@
 </template>
 <script setup lang="ts">
 import {generate} from "random-words";
-import type {ChatId} from "@/app/classes/Chat";
 
 const {savedChats, forgetChat} = useSavedChats()
 
@@ -74,5 +73,4 @@ const joinChat = () => {
     }
 }
 
-const humanizeChatId = (chatId: ChatId) => chatId.replace('-', ' ')
 </script>

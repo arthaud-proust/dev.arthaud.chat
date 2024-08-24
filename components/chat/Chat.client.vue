@@ -8,7 +8,7 @@
             />
 
             <div class="flex flex-wrap grow items-center justify-between gap-2">
-                <span>#{{ room }}</span>
+                <span class="capitalize">{{ humanizeChatId(chatId) }}</span>
 
                 <UButton
                     v-if="isConnected"
@@ -72,7 +72,7 @@ import {useChat} from "@/composables/useChat";
 
 const {username, isUsernameBlank} = useUsername()
 const {params} = useRoute();
-const room = params.room as string;
+const chatId = params.id as string;
 
 const isEditUsernameModalOpen = ref(toValue(isUsernameBlank))
 
@@ -82,7 +82,7 @@ const {
     messageContent,
     isConnected,
     transport
-} = useChat(room)
+} = useChat(chatId)
 
 const displayedMessages = computed(() => toValue(messages).toReversed())
 </script>

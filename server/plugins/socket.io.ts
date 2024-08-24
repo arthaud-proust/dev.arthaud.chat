@@ -20,14 +20,14 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
     const chatManager = new ChatManager()
 
     io.on("connection", (socket) => {
-        const room = socket.handshake.query.room
+        const chatId = socket.handshake.query.chatId
 
-        if (typeof room !== "string") {
+        if (typeof chatId !== "string") {
             return
         }
 
-        socket.join(room)
-        const chat = chatManager.firstOrCreate(room)
+        socket.join(chatId)
+        const chat = chatManager.firstOrCreate(chatId)
 
         socket.emit('message.all', chat.allMessages())
 
@@ -36,7 +36,7 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
 
             const msg = chat.addMessage(sentMsg)
 
-            io.to(room).emit('message.received', msg)
+            io.to(chatId).emit('message.received', msg)
         })
     });
 
