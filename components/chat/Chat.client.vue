@@ -1,12 +1,11 @@
 <template>
     <div class="flex flex-col h-screen">
         <div class="py-4 flex gap-2 items-center">
-            <NuxtLink to="/">
-                <UButton
-                    icon="i-heroicons-arrow-left"
-                    variant="ghost"
-                />
-            </NuxtLink>
+            <UButton
+                to="/"
+                icon="i-heroicons-arrow-left"
+                variant="ghost"
+            />
 
             <div class="flex flex-wrap grow items-center justify-between gap-2">
                 <span>#{{ room }}</span>

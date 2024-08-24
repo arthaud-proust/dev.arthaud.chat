@@ -1,9 +1,12 @@
 import {useSocket} from "@/composables/useSocket";
 import type {ChatMessage} from "@/app/schemas/chat";
 import {SentChatMessageSchema} from "@/app/schemas/chat";
+import {useSavedChats} from "@/composables/useSavedChats";
+import type {ChatId} from "@/app/classes/Chat";
 
 const EMPTY_CURRENT_MESSAGE = "";
-export const useChat = (room: string) => {
+export const useChat = (chatId: ChatId) => {
+    const {saveChat} = useSavedChats();
     const {username} = useUsername()
     const {
         socket,
@@ -11,11 +14,15 @@ export const useChat = (room: string) => {
         isConnected
     } = useSocket({
         query: {
-            room
+            chatId
         }
     })
     const messages = ref<Array<ChatMessage>>([]);
     const messageContent = ref<string>(EMPTY_CURRENT_MESSAGE);
+
+    socket.on("connect", () => {
+        saveChat(chatId)
+    })
 
     socket.on('message.all', (allMessages) => {
         messages.value = allMessages
