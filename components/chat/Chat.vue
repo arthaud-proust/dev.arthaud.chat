@@ -69,10 +69,13 @@
 import ChatMessageCard from "@/components/chat/ChatMessageCard.vue";
 import EditUsernameModal from "@/components/chat/EditUsernameModal.vue"
 import {useChat} from "@/composables/useChat";
+import type {ChatId} from "@/app/classes/Chat";
+
+const props = defineProps<{
+    chatId: ChatId
+}>()
 
 const {username, isUsernameBlank} = useUsername()
-const {params} = useRoute();
-const chatId = params.id as string;
 
 const isEditUsernameModalOpen = ref(toValue(isUsernameBlank))
 
@@ -82,7 +85,7 @@ const {
     messageContent,
     isConnected,
     transport
-} = useChat(chatId)
+} = useChat(props.chatId)
 
 const displayedMessages = computed(() => toValue(messages).toReversed())
 </script>

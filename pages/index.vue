@@ -1,5 +1,8 @@
 <template>
     <div class="min-h-screen flex flex-col justify-center items-center">
+        <Head>
+            <Title>Chat</Title>
+        </Head>
         <div class="min-h-screen flex flex-col justify-center items-center gap-2 w-full">
             <ClientOnly>
                 <UInput
