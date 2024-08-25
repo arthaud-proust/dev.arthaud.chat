@@ -1,5 +1,5 @@
 import {useSocket} from "@/composables/useSocket";
-import type {ChatMessage} from "@/app/schemas/chat";
+import type {ChatMessage, SentChatMessage} from "@/app/schemas/chat";
 import {SentChatMessageSchema} from "@/app/schemas/chat";
 import {useSavedChats} from "@/composables/useSavedChats";
 import type {ChatId} from "@/app/classes/Chat";
@@ -17,7 +17,10 @@ export const useChat = (chatId: ChatId) => {
             chatId
         }
     })
+
+    let currentClientId = 0;
     const messages = ref<Array<ChatMessage>>([]);
+    const sentMessages = ref<Array<SentChatMessage>>([]);
     const messageContent = ref<string>(EMPTY_CURRENT_MESSAGE);
 
     socket.on("connect", () => {
@@ -29,6 +32,12 @@ export const useChat = (chatId: ChatId) => {
     })
     socket.on('message.received', (message) => {
         messages.value.push(message)
+
+        sentMessages.value = toValue(sentMessages).filter(sentMessage => !(
+            sentMessage.author === message.author
+            && sentMessage.clientId === message.clientId
+        ))
+
         window.scrollTo(0, document.body.scrollHeight || document.documentElement.scrollHeight);
     })
 
@@ -40,17 +49,22 @@ export const useChat = (chatId: ChatId) => {
         }
 
         const message = SentChatMessageSchema.parse({
+            clientId: currentClientId,
             author: toValue(username),
             content: toValue(messageContent)
         })
 
+        sentMessages.value.push(message)
+
         socket.emit('message.sent', message);
 
         messageContent.value = EMPTY_CURRENT_MESSAGE;
+        currentClientId++
     }
 
     return {
         messages,
+        sentMessages,
         messageContent,
         canSendMessage,
         sendMessage,

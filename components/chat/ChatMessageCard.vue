@@ -37,13 +37,11 @@ const {username} = useUsername()
 
 const props = defineProps<{
     message: ChatMessage
-    nextMessage?: ChatMessage
     previousMessage?: ChatMessage
 }>()
 
 const isMessageFromMyself = computed(() => props.message.author === toValue(username))
 const previousMessageFromSameAuthor = computed(() => props.previousMessage?.author === props.message.author)
-const nextMessageFromSameAuthor = computed(() => props.nextMessage?.author === props.message.author)
 
 const messageTime = computed(() => {
     const date = new Date(props.message.at)

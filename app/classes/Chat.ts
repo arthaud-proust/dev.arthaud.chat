@@ -14,11 +14,12 @@ export class Chat {
         return [...this.messages]
     }
 
-    addMessage({content, author}: SentChatMessage) {
+    addMessage({clientId, content, author}: SentChatMessage) {
         const message: ChatMessage = {
-            id: this.nextId(),
+            clientId,
             author: author.trim(),
             content: content.trim(),
+            id: this.nextId(),
             at: (new Date()).toISOString()
         }
 
