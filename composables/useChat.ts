@@ -7,7 +7,7 @@ import type {ChatId} from "@/app/classes/Chat";
 const EMPTY_CURRENT_MESSAGE = "";
 export const useChat = (chatId: ChatId) => {
     const {saveChat} = useSavedChats();
-    const {username} = useUsername()
+    const {username, isUsernameBlank} = useUsername()
     const {
         socket,
         transport,
@@ -29,9 +29,16 @@ export const useChat = (chatId: ChatId) => {
     })
     socket.on('message.received', (message) => {
         messages.value.push(message)
+        window.scrollTo(0, document.body.scrollHeight || document.documentElement.scrollHeight);
     })
 
+    const canSendMessage = computed(() => !isBlank(toValue(messageContent)) && !toValue(isUsernameBlank))
+
     const sendMessage = () => {
+        if (!toValue(canSendMessage)) {
+            return
+        }
+
         const message = SentChatMessageSchema.parse({
             author: toValue(username),
             content: toValue(messageContent)
@@ -45,8 +52,8 @@ export const useChat = (chatId: ChatId) => {
     return {
         messages,
         messageContent,
+        canSendMessage,
         sendMessage,
-        socket,
         transport,
         isConnected
     }

@@ -47,7 +47,8 @@ const nextMessageFromSameAuthor = computed(() => props.nextMessage?.author === p
 
 const messageTime = computed(() => {
     const date = new Date(props.message.at)
+    const f = (n: number) => String(n).padStart(2, "0")
 
-    return `${date.getHours()}:${date.getMinutes()}`
+    return `${f(date.getHours())}:${f(date.getMinutes())}`
 })
 </script>
