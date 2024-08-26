@@ -1,4 +1,5 @@
-import {Chat, type ChatId} from "@/app/classes/Chat";
+import {Chat} from "@/app/classes/Chat";
+import type {ChatId} from "@/app/schemas/chat";
 
 export class ChatManager {
     private chats = new Map<ChatId, Chat>();

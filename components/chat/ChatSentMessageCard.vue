@@ -7,7 +7,7 @@
         >
             <p
                 class="text-neutral-500 text-xs px-1"
-                v-if="!previousMessageFromSameAuthor"
+                v-if="!previousMessage"
             >
                 Sending...
             </p>
@@ -24,6 +24,4 @@ const props = defineProps<{
     message: SentChatMessage
     previousMessage?: SentChatMessage
 }>()
-
-const previousMessageFromSameAuthor = computed(() => props.previousMessage?.author === props.message.author)
 </script>

@@ -1,23 +1,27 @@
-import type {ChatMessage, SentChatMessage} from "@/app/schemas/chat";
+import type {ChatId, ChatMessage, SentChatMessage, Username} from "@/app/schemas/chat";
 
-export type ChatId = string
 
 export class Chat {
     readonly id: ChatId;
-    private messages: Array<ChatMessage> = []
+    private messages = new Array<ChatMessage>()
+    private typingAuthors = new Set<Username>()
 
     constructor(id: ChatId) {
         this.id = id;
+    }
+
+    allTypingAuthors() {
+        return [...this.typingAuthors]
     }
 
     allMessages() {
         return [...this.messages]
     }
 
-    addMessage({clientId, content, author}: SentChatMessage) {
+    sendMessage(author: Username, {clientId, content}: SentChatMessage) {
         const message: ChatMessage = {
             clientId,
-            author: author.trim(),
+            author,
             content: content.trim(),
             id: this.nextId(),
             at: (new Date()).toISOString()
@@ -26,6 +30,14 @@ export class Chat {
         this.messages.push(message)
 
         return message
+    }
+
+    startTyping(author: Username): void {
+        this.typingAuthors.add(author)
+    }
+
+    stopTyping(author: Username): void {
+        this.typingAuthors.delete(author)
     }
 
     private nextId() {

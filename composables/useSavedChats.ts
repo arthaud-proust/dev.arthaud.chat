@@ -1,6 +1,6 @@
 import {useLocalStorage} from "@vueuse/core";
 import {localStorageKey} from "@/app/localStorage";
-import type {ChatId} from "@/app/classes/Chat";
+import type {ChatId} from "@/app/schemas/chat";
 
 const SAVED_CHATS_LOCAL_STORAGE_KEY = 'saved-chats';
 export const useSavedChats = () => {

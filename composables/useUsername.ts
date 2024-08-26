@@ -3,12 +3,17 @@ import {localStorageKey} from "@/app/localStorage";
 
 const USERNAME_LOCAL_STORAGE_KEY = 'username';
 export const useUsername = () => {
-    const username = useLocalStorage<string | undefined>(
+    const savedUsername = useLocalStorage<string | undefined>(
         localStorageKey(USERNAME_LOCAL_STORAGE_KEY),
         undefined
     )
 
     const isUsernameBlank = computed(() => isBlank(toValue(username)))
+
+    const username = computed({
+        get: () => toValue(savedUsername),
+        set: (v) => savedUsername.value = v?.trim()
+    })
 
     return {
         username,

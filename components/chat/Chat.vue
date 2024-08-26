@@ -12,14 +12,13 @@
                     <div class="flex flex-wrap grow items-center justify-between gap-2">
                         <span class="capitalize">{{ humanizeChatId(chatId) }}</span>
 
-                        <UButton
+                        <UBadge
                             v-if="isConnected"
                             color="green"
                             variant="soft"
-                            @click="isEditUsernameModalOpen=true"
                         >
-                            Connected via {{ transport }} as {{ username }}
-                        </UButton>
+                            Connected via {{ transport }}
+                        </UBadge>
                         <UBadge
                             v-else
                             color="red"
@@ -45,7 +44,7 @@
                     />
                 </section>
 
-                <footer class="sticky bottom-0 w-full flex flex-col items-center gap-2">
+                <footer class="sticky bottom-0 w-full flex flex-col items-center gap-2 py-2">
                     <UButton
                         v-if="displayNewMessageBtn"
                         variant="soft"
@@ -56,7 +55,11 @@
                         New message
                     </UButton>
 
-                    <div class="w-full py-2 shrink-0 bg-white flex gap-2 items-start">
+                    <p class="w-full text-sm text-neutral-400" :class="typingAuthors.length > 0 ? 'opacity-100':'opacity-0'">
+                        {{ typingAuthors.join(', ') }} {{ typingAuthors.length === 1 ? 'is' : 'are' }} typing...
+                    </p>
+
+                    <div class="w-full shrink-0 bg-white flex gap-2 items-start">
                         <UTextarea
                             ref="refUTextarea"
                             autofocus
@@ -83,7 +86,6 @@
                     </div>
                 </footer>
 
-                <EditUsernameModal v-model:opened="isEditUsernameModalOpen" />
             </div>
         </UContainer>
     </main>
@@ -91,19 +93,15 @@
 
 <script setup lang="ts">
 import ChatMessageCard from "@/components/chat/ChatMessageCard.vue";
-import EditUsernameModal from "@/components/chat/EditUsernameModal.vue"
 import {useChat} from "@/composables/useChat";
-import type {ChatId} from "@/app/classes/Chat";
 import type {UTextarea} from "#components";
 import ChatSentMessageCard from "@/components/chat/ChatSentMessageCard.vue";
+import type {ChatId, Username,} from "@/app/schemas/chat";
 
 const props = defineProps<{
-    chatId: ChatId
+    chatId: ChatId,
+    username: Username
 }>()
-
-const {username, isUsernameBlank} = useUsername()
-
-const isEditUsernameModalOpen = ref(toValue(isUsernameBlank))
 
 const refContainer = ref<HTMLElement>()
 const refInner = ref<HTMLElement>()
@@ -115,9 +113,13 @@ const {
     messages,
     sentMessages,
     messageContent,
+    typingAuthors,
     isConnected,
     transport
-} = useChat(props.chatId)
+} = useChat({
+    chatId: props.chatId,
+    username: props.username
+})
 
 const sendMessageAndFocusAgain = async () => {
     sendMessage()
@@ -146,7 +148,6 @@ watch(displayedMessages, (value, oldValue) => {
 
     if (refContainer.value) {
         const bottomDistance = refContainer.value.scrollHeight - refContainer.value.clientHeight - refContainer.value.scrollTop
-        console.log(bottomDistance)
         if (bottomDistance < MAX_BOTTOM_DISTANCE_TO_SCROLL_END) {
             scrollToEnd()
         } else {

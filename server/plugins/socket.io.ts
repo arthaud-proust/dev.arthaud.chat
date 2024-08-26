@@ -4,7 +4,7 @@ import {Server} from "socket.io";
 import {defineEventHandler} from "h3";
 import {ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData} from "@/app/schemas/io";
 import {ChatManager} from "~/app/classes/ChatManager";
-import {SentChatMessageSchema} from "~/app/schemas/chat";
+import {ChatIdSchema, SentChatMessageSchema, UsernameSchema} from "~/app/schemas/chat";
 
 export default defineNitroPlugin((nitroApp: NitroApp) => {
     const engine = new Engine();
@@ -20,11 +20,8 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
     const chatManager = new ChatManager()
 
     io.on("connection", (socket) => {
-        const chatId = socket.handshake.query.chatId
-
-        if (typeof chatId !== "string") {
-            return
-        }
+        const chatId = ChatIdSchema.parse(socket.handshake.query.chatId).trim()
+        const author = UsernameSchema.parse(socket.handshake.query.username).trim()
 
         socket.join(chatId)
         const chat = chatManager.firstOrCreate(chatId)
@@ -34,9 +31,19 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
         socket.on('message.sent', (data) => {
             const sentMsg = SentChatMessageSchema.parse(data)
 
-            const msg = chat.addMessage(sentMsg)
+            const msg = chat.sendMessage(author, sentMsg)
 
             io.to(chatId).emit('message.received', msg)
+        })
+
+        socket.on('message.typing.started', () => {
+            chat.startTyping(author)
+            io.to(chatId).emit('message.typing', chat.allTypingAuthors())
+        })
+
+        socket.on('message.typing.stopped', () => {
+            chat.stopTyping(author)
+            io.to(chatId).emit('message.typing', chat.allTypingAuthors())
         })
     });
 

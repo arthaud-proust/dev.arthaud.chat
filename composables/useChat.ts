@@ -1,27 +1,49 @@
 import {useSocket} from "@/composables/useSocket";
-import type {ChatMessage, SentChatMessage} from "@/app/schemas/chat";
+import type {ChatId, ChatMessage, SentChatMessage, Username} from "@/app/schemas/chat";
 import {SentChatMessageSchema} from "@/app/schemas/chat";
 import {useSavedChats} from "@/composables/useSavedChats";
-import type {ChatId} from "@/app/classes/Chat";
 
 const EMPTY_CURRENT_MESSAGE = "";
-export const useChat = (chatId: ChatId) => {
+
+export type UseChatProps = {
+    chatId: ChatId;
+    username: Username
+}
+export const useChat = ({chatId, username}: UseChatProps) => {
     const {saveChat} = useSavedChats();
-    const {username, isUsernameBlank} = useUsername()
     const {
         socket,
         transport,
         isConnected
     } = useSocket({
         query: {
-            chatId
+            chatId,
+            username
         }
     })
 
     let currentClientId = 0;
+    const typingAuthors = ref<Array<Username>>([]);
     const messages = ref<Array<ChatMessage>>([]);
     const sentMessages = ref<Array<SentChatMessage>>([]);
     const messageContent = ref<string>(EMPTY_CURRENT_MESSAGE);
+
+    const STOP_TYPING_TIMEOUT = 1_000;
+    const stopTyping = () => {
+        socket.emit('message.typing.stopped')
+        stopTypingTimeoutHandler = undefined
+    }
+    let stopTypingTimeoutHandler: NodeJS.Timeout | undefined;
+
+    watch(messageContent, () => {
+        if (stopTypingTimeoutHandler) {
+            clearTimeout(stopTypingTimeoutHandler);
+        } else {
+            socket.emit('message.typing.started')
+        }
+
+        stopTypingTimeoutHandler = setTimeout(stopTyping, STOP_TYPING_TIMEOUT)
+    })
 
     socket.on("connect", () => {
         saveChat(chatId)
@@ -30,18 +52,22 @@ export const useChat = (chatId: ChatId) => {
     socket.on('message.all', (allMessages) => {
         messages.value = allMessages
     })
+
     socket.on('message.received', (message) => {
         messages.value.push(message)
 
-        sentMessages.value = toValue(sentMessages).filter(sentMessage => !(
-            sentMessage.author === message.author
-            && sentMessage.clientId === message.clientId
-        ))
-
-        window.scrollTo(0, document.body.scrollHeight || document.documentElement.scrollHeight);
+        if (message.author === username) {
+            sentMessages.value = toValue(sentMessages).filter(
+                sentMessage => sentMessage.clientId !== message.clientId
+            )
+        }
     })
 
-    const canSendMessage = computed(() => !isBlank(toValue(messageContent)) && !toValue(isUsernameBlank))
+    socket.on('message.typing', (authors) => {
+        typingAuthors.value = authors.filter(author => author !== username)
+    })
+
+    const canSendMessage = computed(() => !isBlank(toValue(messageContent)))
 
     const sendMessage = () => {
         if (!toValue(canSendMessage)) {
@@ -50,25 +76,27 @@ export const useChat = (chatId: ChatId) => {
 
         const message = SentChatMessageSchema.parse({
             clientId: currentClientId,
-            author: toValue(username),
             content: toValue(messageContent)
         })
+
+        messageContent.value = EMPTY_CURRENT_MESSAGE;
+        stopTyping()
+        currentClientId++
 
         sentMessages.value.push(message)
 
         socket.emit('message.sent', message);
-
-        messageContent.value = EMPTY_CURRENT_MESSAGE;
-        currentClientId++
     }
 
     return {
-        messages,
-        sentMessages,
         messageContent,
         canSendMessage,
         sendMessage,
-        transport,
-        isConnected
+
+        messages: readonly(messages),
+        sentMessages: readonly(sentMessages),
+        typingAuthors: readonly(typingAuthors),
+        transport: readonly(transport),
+        isConnected: readonly(isConnected)
     }
 }
