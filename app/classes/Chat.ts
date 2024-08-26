@@ -1,4 +1,4 @@
-import type {ChatId, ChatMessage, SentChatMessage, Username} from "@/app/schemas/chat";
+import type {ChatId, ChatMessage, ChatMessageId, ReactToMessage, SentChatMessage, Username} from "@/app/schemas/chat";
 
 
 export class Chat {
@@ -24,7 +24,8 @@ export class Chat {
             author,
             content: content.trim(),
             id: this.nextId(),
-            at: (new Date()).toISOString()
+            at: (new Date()).toISOString(),
+            reactions: {}
         }
 
         this.messages.push(message)
@@ -38,6 +39,30 @@ export class Chat {
 
     stopTyping(author: Username): void {
         this.typingAuthors.delete(author)
+    }
+
+    react(author: Username, {messageId, reaction}: ReactToMessage) {
+        const message = this.findMessage(messageId)
+
+        message.reactions[author] = reaction
+
+        return message
+    }
+
+    unreact(author: Username, messageId: ChatMessageId) {
+        const message = this.findMessage(messageId)
+
+        delete message.reactions[author]
+
+        return message
+    }
+
+    private findMessage(messageId: ChatMessageId): ChatMessage {
+        const message = this.messages.find(message => message.id === messageId)
+
+        if (!message) throw new Error(`${messageId} not found`)
+
+        return message
     }
 
     private nextId() {

@@ -1,6 +1,6 @@
 import {useSocket} from "@/composables/useSocket";
-import type {ChatId, ChatMessage, SentChatMessage, Username} from "@/app/schemas/chat";
-import {SentChatMessageSchema} from "@/app/schemas/chat";
+import type {ChatId, ChatMessage, ChatMessageId, ChatMessageReaction, SentChatMessage, Username} from "@/app/schemas/chat";
+import {ChatMessageIdSchema, ReactToMessageSchema, SentChatMessageSchema} from "@/app/schemas/chat";
 import {useSavedChats} from "@/composables/useSavedChats";
 
 const EMPTY_CURRENT_MESSAGE = "";
@@ -67,6 +67,19 @@ export const useChat = ({chatId, username}: UseChatProps) => {
         typingAuthors.value = authors.filter(author => author !== username)
     })
 
+    socket.on('message.updated', (updatedMessage) => {
+        const sourceMessage = toValue(messages).find((message) => message.id === updatedMessage.id)
+
+        if (!sourceMessage) {
+            throw new Error(`${updatedMessage.id} not found`)
+        }
+
+        Object.assign(
+            sourceMessage,
+            updatedMessage
+        )
+    })
+
     const canSendMessage = computed(() => !isBlank(toValue(messageContent)))
 
     const sendMessage = () => {
@@ -88,10 +101,22 @@ export const useChat = ({chatId, username}: UseChatProps) => {
         socket.emit('message.sent', message);
     }
 
+    const reactToMessage = (messageId: ChatMessageId, reaction: ChatMessageReaction) => {
+        socket.emit('message.react', ReactToMessageSchema.parse({
+            messageId,
+            reaction
+        }))
+    }
+    const unreactToMessage = (messageId: ChatMessageId) => {
+        socket.emit('message.unreact', ChatMessageIdSchema.parse(messageId))
+    }
+
     return {
         messageContent,
         canSendMessage,
         sendMessage,
+        reactToMessage,
+        unreactToMessage,
 
         messages: readonly(messages),
         sentMessages: readonly(sentMessages),

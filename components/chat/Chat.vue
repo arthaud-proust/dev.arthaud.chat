@@ -41,6 +41,8 @@
                         :key="message.id"
                         :message="message"
                         :previous-message="displayedMessages[index+1]"
+                        @react="(reaction)=>reactToMessage(message.id, reaction)"
+                        @unreact="()=>unreactToMessage(message.id)"
                     />
                 </section>
 
@@ -109,6 +111,8 @@ const refInner = ref<HTMLElement>()
 const refUTextarea = ref<typeof UTextarea>()
 const {
     sendMessage,
+    reactToMessage,
+    unreactToMessage,
     canSendMessage,
     messages,
     sentMessages,
