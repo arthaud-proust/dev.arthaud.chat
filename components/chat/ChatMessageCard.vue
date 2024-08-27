@@ -38,7 +38,6 @@
             </div>
         </div>
     </div>
-
 </template>
 <script setup lang="ts">
 import type {ChatMessage, ChatMessageReaction, Username} from "@/app/schemas/chat";

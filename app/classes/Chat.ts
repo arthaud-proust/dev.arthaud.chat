@@ -1,5 +1,5 @@
 import type {ChatId, ChatMessage, ChatMessageId, ReactToMessage, SentChatMessage, Username} from "@/app/schemas/chat";
-
+import {fakeConversation} from "@/app/stub/fakeConversation"
 
 export class Chat {
     readonly id: ChatId;
@@ -8,6 +8,10 @@ export class Chat {
 
     constructor(id: ChatId) {
         this.id = id;
+
+        if (this.id === 'test') {
+            this.messages.push(...fakeConversation)
+        }
     }
 
     allTypingAuthors() {
