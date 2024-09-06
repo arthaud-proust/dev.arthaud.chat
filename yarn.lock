@@ -1727,6 +1727,15 @@
   resolved "https://registry.yarnpkg.com/@vue/shared/-/shared-3.4.38.tgz#552a6770098bfd556fa3e2c686c9d3b4f4cd94c2"
   integrity sha512-q0xCiLkuWWQLzVrecPb0RMsNWyxICOjPrcrwxTUEHb1fsnvni4dcuyG7RT/Ie7VPTvnjzIaWzRMUBsrqNj/hhw==
 
+"@vueuse/components@^11.0.3":
+  version "11.0.3"
+  resolved "https://registry.yarnpkg.com/@vueuse/components/-/components-11.0.3.tgz#d2ff9f761ec58efdb360bcdde471f84477f69d69"
+  integrity sha512-/mbv4R1ody3rYz42U14SQ6GkAKHCAHhFIBdR6nKJbEJeFMoiB93dzX0sT2S05CpYCJJgv3JLAwEHeehYqqmbyQ==
+  dependencies:
+    "@vueuse/core" "11.0.3"
+    "@vueuse/shared" "11.0.3"
+    vue-demi ">=0.14.10"
+
 "@vueuse/core@10.11.1", "@vueuse/core@^10.11.0":
   version "10.11.1"
   resolved "https://registry.yarnpkg.com/@vueuse/core/-/core-10.11.1.tgz#15d2c0b6448d2212235b23a7ba29c27173e0c2c6"
@@ -1736,6 +1745,16 @@
     "@vueuse/metadata" "10.11.1"
     "@vueuse/shared" "10.11.1"
     vue-demi ">=0.14.8"
+
+"@vueuse/core@11.0.3":
+  version "11.0.3"
+  resolved "https://registry.yarnpkg.com/@vueuse/core/-/core-11.0.3.tgz#e5fb5aa6580c6e505cecea43518fcb66cb56a3ef"
+  integrity sha512-RENlh64+SYA9XMExmmH1a3TPqeIuJBNNB/63GT35MZI+zpru3oMRUA6cEFr9HmGqEgUisurwGwnIieF6qu3aXw==
+  dependencies:
+    "@types/web-bluetooth" "^0.0.20"
+    "@vueuse/metadata" "11.0.3"
+    "@vueuse/shared" "11.0.3"
+    vue-demi ">=0.14.10"
 
 "@vueuse/integrations@^10.11.0":
   version "10.11.1"
@@ -1759,12 +1778,24 @@
   resolved "https://registry.yarnpkg.com/@vueuse/metadata/-/metadata-10.11.1.tgz#209db7bb5915aa172a87510b6de2ca01cadbd2a7"
   integrity sha512-IGa5FXd003Ug1qAZmyE8wF3sJ81xGLSqTqtQ6jaVfkeZ4i5kS2mwQF61yhVqojRnenVew5PldLyRgvdl4YYuSw==
 
+"@vueuse/metadata@11.0.3":
+  version "11.0.3"
+  resolved "https://registry.yarnpkg.com/@vueuse/metadata/-/metadata-11.0.3.tgz#f3f20066fb5217df24614de92162b65c24475e1b"
+  integrity sha512-+FtbO4SD5WpsOcQTcC0hAhNlOid6QNLzqedtquTtQ+CRNBoAt9GuV07c6KNHK1wCmlq8DFPwgiLF2rXwgSHX5Q==
+
 "@vueuse/shared@10.11.1":
   version "10.11.1"
   resolved "https://registry.yarnpkg.com/@vueuse/shared/-/shared-10.11.1.tgz#62b84e3118ae6e1f3ff38f4fbe71b0c5d0f10938"
   integrity sha512-LHpC8711VFZlDaYUXEBbFBCQ7GS3dVU9mjOhhMhXP6txTV4EhYQg/KGnQuvt/sPAtoUKq7VVUnL6mVtFoL42sA==
   dependencies:
     vue-demi ">=0.14.8"
+
+"@vueuse/shared@11.0.3":
+  version "11.0.3"
+  resolved "https://registry.yarnpkg.com/@vueuse/shared/-/shared-11.0.3.tgz#0e5519dcdc9ac0c6fc831c105a9e7ba7bda98628"
+  integrity sha512-0rY2m6HS5t27n/Vp5cTDsKTlNnimCqsbh/fmT2LgE+aaU42EMfXo8+bNX91W9I7DDmxfuACXMmrd7d79JxkqWA==
+  dependencies:
+    vue-demi ">=0.14.10"
 
 abbrev@1:
   version "1.1.1"
@@ -2693,6 +2724,11 @@ electron-to-chromium@^1.5.4:
   version "1.5.13"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.13.tgz#1abf0410c5344b2b829b7247e031f02810d442e6"
   integrity sha512-lbBcvtIJ4J6sS4tb5TLp1b4LyfCdMkwStzXPyAgVgTRAsep4bvrAGaBOP7ZJtQMNJpSQ9SqG4brWOroNaQtm7Q==
+
+emoji-picker-element@^1.21.1:
+  version "1.22.4"
+  resolved "https://registry.yarnpkg.com/emoji-picker-element/-/emoji-picker-element-1.22.4.tgz#5bbb9b77685c1831955613369efcd29677b5b0e0"
+  integrity sha512-2kealqo1bvQjlspkgXqC/eUBAhgP9WymSzaV9CPH5G3DOLgq1qA88IWHypcgkgbIiedP5w6LL2redVxsg9uKIA==
 
 emoji-regex@^8.0.0:
   version "8.0.0"
@@ -5885,7 +5921,7 @@ vue-bundle-renderer@^2.1.0:
   dependencies:
     ufo "^1.5.3"
 
-vue-demi@>=0.14.8:
+vue-demi@>=0.14.10, vue-demi@>=0.14.8, vue-demi@^0.14.7:
   version "0.14.10"
   resolved "https://registry.yarnpkg.com/vue-demi/-/vue-demi-0.14.10.tgz#afc78de3d6f9e11bf78c55e8510ee12814522f04"
   integrity sha512-nMZBOwuzabUO0nLgIcc6rycZEebF6eeUfaiQx9+WSk8e29IbLvPU9feI6tqW4kTo3hvoYAJkMh8n8D0fuISphg==
@@ -5912,6 +5948,14 @@ vue@^3.4.38:
     "@vue/runtime-dom" "3.4.38"
     "@vue/server-renderer" "3.4.38"
     "@vue/shared" "3.4.38"
+
+vuemoji-picker@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/vuemoji-picker/-/vuemoji-picker-0.2.1.tgz#29f80a3eb25461316a81c7968b4b43f314411f82"
+  integrity sha512-wKRZBZclTdnQIT4jPzmkJ5Ci9ObzMFPjkuYb+/+/9h+mAZIUwdcPqYbEJCohbxJPoOvkuPVDeuOdTKR8hqqVLA==
+  dependencies:
+    emoji-picker-element "^1.21.1"
+    vue-demi "^0.14.7"
 
 webidl-conversions@^3.0.0:
   version "3.0.1"

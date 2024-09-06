@@ -24,6 +24,8 @@
             <div
                 @click="bdlClickReact"
                 class="grow px-3 py-2 bg-white border rounded-3xl"
+                @touchstart.prevent="startPress"
+                @touchend="stopPress"
             >
                 <p>{{ message.content }}</p>
             </div>
@@ -37,11 +39,32 @@
                 </div>
             </div>
         </div>
+
+        <UModal
+            v-model="isEmojiPickerOpen"
+            prevent-close
+        >
+            <UCard>
+                <template #header>
+                    <div class="flex items-center justify-between">
+                        <UButton color="gray" variant="ghost" class="-my-1" @click="onUnreact">
+                            Remove reaction
+                        </UButton>
+                        <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="isEmojiPickerOpen = false" />
+                    </div>
+                </template>
+                <VuemojiPicker
+                    :isDark="false"
+                    @emojiClick="onSelectEmoji"
+                />
+            </UCard>
+
+        </UModal>
     </div>
 </template>
 <script setup lang="ts">
 import type {ChatMessage, ChatMessageReaction, Username} from "@/app/schemas/chat";
-import {onDoubleClick} from "@/utils/onDoubleClick";
+import {type EmojiClickEventDetail, VuemojiPicker} from 'vuemoji-picker'
 
 const {username} = useUsername()
 
@@ -74,6 +97,26 @@ const handleReact = () => {
 }
 const bdlClickReact = onDoubleClick(handleReact)
 
+const isEmojiPickerOpen = ref(false)
+const {
+    startPress,
+    stopPress
+} = onLongPress(async () => {
+    await nextTick()
+    isEmojiPickerOpen.value = true
+})
+
+const onSelectEmoji = (e: EmojiClickEventDetail) => {
+    if (e.unicode) {
+        emit('react', e.unicode)
+        isEmojiPickerOpen.value = false
+    }
+}
+const onUnreact = () => {
+    emit('unreact')
+    isEmojiPickerOpen.value = false
+}
+
 const hasReaction = computed(() => Object.keys(props.message.reactions).length > 0)
 
 const reactions = computed(() => {
@@ -88,3 +131,10 @@ const reactions = computed(() => {
     return count
 })
 </script>
+<style>
+emoji-picker {
+    width: 100%;
+    height: 30vh;
+    --border-size: 0px;
+}
+</style>
