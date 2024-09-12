@@ -29,15 +29,19 @@
             >
                 <p>{{ message.content }}</p>
             </div>
-            <div v-if="hasReaction" class="text-sm rounded-full bg-neutral-100 border-2 border-white py-0.5 px-1.5 flex gap-1 ml-2 mr-auto -mt-2">
-                <div
+            <button
+                v-if="hasReaction"
+                @click="isEmojiPickerOpen = true"
+                class="text-sm rounded-full bg-neutral-100 border-2 border-white py-0.5 px-1.5 flex gap-1 ml-2 mr-auto -mt-2"
+            >
+                <span
                     class="flex gap-0.5"
                     v-for="(users, reaction) in reactions"
                 >
                     <span>{{ reaction }}</span>
                     <span v-if="users.length > 1">{{ users.length }}</span>
-                </div>
-            </div>
+                </span>
+            </button>
         </div>
 
         <UModal
