@@ -51,10 +51,10 @@
             <UCard>
                 <template #header>
                     <div class="flex items-center justify-between">
-                        <UButton color="gray" variant="ghost" class="-my-1" @click="onUnreact">
+                        <UButton color="gray" variant="soft" class="-my-1" @click="onUnreact">
                             Remove reaction
                         </UButton>
-                        <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="isEmojiPickerOpen = false" />
+                        <UButton color="gray" variant="soft" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="isEmojiPickerOpen = false" />
                     </div>
                 </template>
                 <VuemojiPicker
