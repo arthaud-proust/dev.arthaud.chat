@@ -22,10 +22,11 @@
                 {{ message.author }}
             </p>
             <div
-                @click="bdlClickReact"
                 class="grow px-3 py-2 bg-white border rounded-3xl"
-                @touchstart.prevent="startPress"
-                @touchend="stopPress"
+                @mousedown.prevent="startClick"
+                @mouseup="endClick"
+                @touchstart.prevent="startClick"
+                @touchend="endClick"
             >
                 <p>{{ message.content }}</p>
             </div>
@@ -69,6 +70,7 @@
 <script setup lang="ts">
 import type {ChatMessage, ChatMessageReaction, Username} from "@/app/schemas/chat";
 import {type EmojiClickEventDetail, VuemojiPicker} from 'vuemoji-picker'
+import {useOnClick} from "@/utils/onClick";
 
 const {username} = useUsername()
 
@@ -94,19 +96,18 @@ const messageTime = computed(() => {
 
 const userAlreadyReacted = computed(() => Object.keys(props.message.reactions).includes(toValue(username)!))
 
-const handleReact = () => toValue(userAlreadyReacted)
-    ? emit('unreact')
-    : emit('react', '❤️')
-
-const bdlClickReact = onDoubleClick(handleReact)
-
 const isEmojiPickerOpen = ref(false)
 const {
-    startPress,
-    stopPress
-} = onLongPress(async () => {
-    await nextTick()
-    isEmojiPickerOpen.value = true
+    startClick,
+    endClick
+} = useOnClick({
+    onLongPress: async () => {
+        await nextTick()
+        isEmojiPickerOpen.value = true
+    },
+    onDoubleClick: () => toValue(userAlreadyReacted)
+        ? emit('unreact')
+        : emit('react', '❤️')
 })
 
 const onSelectEmoji = (e: EmojiClickEventDetail) => {
