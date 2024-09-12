@@ -1,4 +1,4 @@
-export const onLongPress = (callback: Function, msDelay: number = 500) => {
+export const onLongPress = (callback: Function, msDelay: number = 200) => {
     let timeout: NodeJS.Timeout | undefined;
 
     const startPress = (e: Event) => {
