@@ -92,13 +92,12 @@ const messageTime = computed(() => {
     return `${f(date.getHours())}:${f(date.getMinutes())}`
 })
 
-const handleReact = () => {
-    const userAlreadyReacted = Object.keys(props.message.reactions).includes(toValue(username)!)
+const userAlreadyReacted = computed(() => Object.keys(props.message.reactions).includes(toValue(username)!))
 
-    userAlreadyReacted
-        ? emit('unreact')
-        : emit('react', '❤️')
-}
+const handleReact = () => toValue(userAlreadyReacted)
+    ? emit('unreact')
+    : emit('react', '❤️')
+
 const bdlClickReact = onDoubleClick(handleReact)
 
 const isEmojiPickerOpen = ref(false)
@@ -112,8 +111,11 @@ const {
 
 const onSelectEmoji = (e: EmojiClickEventDetail) => {
     if (e.unicode) {
-        emit('react', e.unicode)
         isEmojiPickerOpen.value = false
+
+        toValue(userAlreadyReacted)
+            ? emit('unreact')
+            : emit('react', e.unicode)
     }
 }
 const onUnreact = () => {
