@@ -22,26 +22,55 @@
                 {{ message.author }}
             </p>
             <div
-                @click="bdlClickReact"
                 class="grow px-3 py-2 bg-white border rounded-3xl"
+                @mousedown.prevent="startClick"
+                @mouseup="endClick"
+                @touchstart.prevent="startClick"
+                @touchend="endClick"
             >
                 <p>{{ message.content }}</p>
             </div>
-            <div v-if="hasReaction" class="text-sm rounded-full bg-neutral-100 border-2 border-white py-0.5 px-1.5 flex gap-1 ml-2 mr-auto -mt-2">
-                <div
+            <button
+                v-if="hasReaction"
+                @click="isEmojiPickerOpen = true"
+                class="text-sm rounded-full bg-neutral-100 border-2 border-white py-0.5 px-1.5 flex gap-1 ml-2 mr-auto -mt-2"
+            >
+                <span
                     class="flex gap-0.5"
                     v-for="(users, reaction) in reactions"
                 >
                     <span>{{ reaction }}</span>
                     <span v-if="users.length > 1">{{ users.length }}</span>
-                </div>
-            </div>
+                </span>
+            </button>
         </div>
+
+        <UModal
+            v-model="isEmojiPickerOpen"
+            prevent-close
+        >
+            <UCard>
+                <template #header>
+                    <div class="flex items-center justify-between">
+                        <UButton color="gray" variant="soft" class="-my-1" @click="onUnreact">
+                            Remove reaction
+                        </UButton>
+                        <UButton color="gray" variant="soft" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="isEmojiPickerOpen = false" />
+                    </div>
+                </template>
+                <VuemojiPicker
+                    :isDark="false"
+                    @emojiClick="onSelectEmoji"
+                />
+            </UCard>
+
+        </UModal>
     </div>
 </template>
 <script setup lang="ts">
 import type {ChatMessage, ChatMessageReaction, Username} from "@/app/schemas/chat";
-import {onDoubleClick} from "@/utils/onDoubleClick";
+import {type EmojiClickEventDetail, VuemojiPicker} from 'vuemoji-picker'
+import {useOnClick} from "@/utils/onClick";
 
 const {username} = useUsername()
 
@@ -65,14 +94,35 @@ const messageTime = computed(() => {
     return `${f(date.getHours())}:${f(date.getMinutes())}`
 })
 
-const handleReact = () => {
-    const userAlreadyReacted = Object.keys(props.message.reactions).includes(toValue(username)!)
+const userAlreadyReacted = computed(() => Object.keys(props.message.reactions).includes(toValue(username)!))
 
-    userAlreadyReacted
+const isEmojiPickerOpen = ref(false)
+const {
+    startClick,
+    endClick
+} = useOnClick({
+    onLongPress: async () => {
+        await nextTick()
+        isEmojiPickerOpen.value = true
+    },
+    onDoubleClick: () => toValue(userAlreadyReacted)
         ? emit('unreact')
         : emit('react', '❤️')
+})
+
+const onSelectEmoji = (e: EmojiClickEventDetail) => {
+    if (e.unicode) {
+        isEmojiPickerOpen.value = false
+
+        toValue(userAlreadyReacted)
+            ? emit('unreact')
+            : emit('react', e.unicode)
+    }
 }
-const bdlClickReact = onDoubleClick(handleReact)
+const onUnreact = () => {
+    emit('unreact')
+    isEmojiPickerOpen.value = false
+}
 
 const hasReaction = computed(() => Object.keys(props.message.reactions).length > 0)
 
@@ -88,3 +138,10 @@ const reactions = computed(() => {
     return count
 })
 </script>
+<style>
+emoji-picker {
+    width: 100%;
+    height: 30vh;
+    --border-size: 0px;
+}
+</style>
