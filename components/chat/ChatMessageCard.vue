@@ -52,10 +52,11 @@
             <UCard>
                 <template #header>
                     <div class="flex items-center justify-between">
-                        <UButton color="gray" variant="soft" class="-my-1" @click="onUnreact">
-                            Remove reaction
+                        <UButton v-if="userReaction" color="gray" variant="soft" class="-my-1" @click="onUnreact">
+                            Remove reaction ({{ userReaction }})
                         </UButton>
-                        <UButton color="gray" variant="soft" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="isEmojiPickerOpen = false" />
+                        <UButton color="gray" variant="soft" icon="i-heroicons-x-mark-20-solid" class="ml-auto -my-1"
+                                 @click="isEmojiPickerOpen = false" />
                     </div>
                 </template>
                 <VuemojiPicker
@@ -86,6 +87,7 @@ const emit = defineEmits<{
 
 const isMessageFromMyself = computed(() => props.message.author === toValue(username))
 const previousMessageFromSameAuthor = computed(() => props.previousMessage?.author === props.message.author)
+const userReaction = computed(() => props.message.reactions[toValue(username)])
 
 const messageTime = computed(() => {
     const date = new Date(props.message.at)
@@ -94,7 +96,7 @@ const messageTime = computed(() => {
     return `${f(date.getHours())}:${f(date.getMinutes())}`
 })
 
-const userAlreadyReacted = computed(() => Object.keys(props.message.reactions).includes(toValue(username)!))
+const userReactedWith = (emoji) => toValue(userReaction) === emoji
 
 const isEmojiPickerOpen = ref(false)
 const {
@@ -105,18 +107,20 @@ const {
         await nextTick()
         isEmojiPickerOpen.value = true
     },
-    onDoubleClick: () => toValue(userAlreadyReacted)
+    onDoubleClick: () => userReactedWith('❤️')
         ? emit('unreact')
         : emit('react', '❤️')
 })
 
 const onSelectEmoji = (e: EmojiClickEventDetail) => {
-    if (e.unicode) {
+    const emoji = e.unicode
+
+    if (emoji) {
         isEmojiPickerOpen.value = false
 
-        toValue(userAlreadyReacted)
+        userReactedWith(emoji)
             ? emit('unreact')
-            : emit('react', e.unicode)
+            : emit('react', emoji)
     }
 }
 const onUnreact = () => {

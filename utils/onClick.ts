@@ -21,7 +21,6 @@ export const useOnClick = (
 
 
     const startClick = (e: Event) => {
-        console.log('startClick')
         clearTimeout(longPressTimeout)
         clearTimeout(doubleClickTimeout)
 
@@ -37,8 +36,6 @@ export const useOnClick = (
     }
 
     const endClick = (e: Event) => {
-        console.log('endClick')
-
         clearTimeout(longPressTimeout)
     }
 
